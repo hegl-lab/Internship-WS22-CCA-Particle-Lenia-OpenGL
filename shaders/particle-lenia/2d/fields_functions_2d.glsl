@@ -1,4 +1,4 @@
-// FILE: shaders/particle-lenia/fields_functions_2d.glsl
+// FILE: shaders/particle-lenia/2d/fields_functions_2d.glsl
 #version 430 core
 
 uniform float view_width;

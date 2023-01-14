@@ -1,4 +1,4 @@
-// FILE: shaders/particle-lenia/fields_2d.frag
+// FILE: shaders/particle-lenia/2d/fields_2d.frag
 // this file get's prefixed with fields_functions_2d.glsl
 
 out vec4 FragColor;

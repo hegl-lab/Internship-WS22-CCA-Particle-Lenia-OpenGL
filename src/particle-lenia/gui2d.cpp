@@ -55,8 +55,8 @@ unsigned int VAO;
 Buffer particles_a(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
 Buffer particles_b(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
 
-SimpleShader shader("shaders/particle-lenia/particle_2d.generated.vert", "shaders/particle-lenia/particle.frag");
-FragmentOnlyShader info_shader("shaders/particle-lenia/fields_2d.generated.frag");
+SimpleShader shader("shaders/particle-lenia/2d/particle_2d.generated.vert", "shaders/particle-lenia/particle.frag");
+FragmentOnlyShader info_shader("shaders/particle-lenia/2d/fields_2d.generated.frag");
 
 bool render_loop_call(GLFWwindow *window);
 

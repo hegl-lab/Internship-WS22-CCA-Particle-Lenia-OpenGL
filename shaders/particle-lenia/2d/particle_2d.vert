@@ -1,4 +1,4 @@
-// FILE: shaders/particle-lenia/particle_2d.vert
+// FILE: shaders/particle-lenia/2d/particle_2d.vert
 // this file get's prefixed with fields_functions_2d.glsl
 
 // value for gradient calculations
