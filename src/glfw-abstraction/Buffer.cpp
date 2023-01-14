@@ -3,32 +3,37 @@
 
 Buffer::Buffer() {}
 
-Buffer::Buffer(int size) : size(size) {}
+Buffer::Buffer(int size, int type) : size(size), type(type) {}
 
 void Buffer::init() {
     glGenBuffers(1, &id);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * size, nullptr, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(type, id);
+    glBufferData(type, sizeof(float) * size, nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(type, 0);
 }
 
 void Buffer::set_data(const std::vector<float> &data) {
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    glBindBuffer(type, id);
+    GLvoid* p = glMapBuffer(type, GL_WRITE_ONLY);
     memcpy(p, data.data(), sizeof(float) * size);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glUnmapBuffer(type);
 }
 
 std::vector<float> Buffer::get_data() const {
     std::vector<float> data(size);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(float), data.data());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glBindBuffer(type, id);
+    glGetBufferSubData(type, 0, size * sizeof(float), data.data());
+    glUnmapBuffer(type);
     return data;
 }
 
 void Buffer::bind(int index) const {
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, id);
+    glBindBufferBase(type, index, id);
+}
+
+void Buffer::delete_buffer() {
+    glDeleteBuffers(1, &id);
+    id = -1;
 }
 
 

@@ -9,6 +9,7 @@
 extern int CURRENT_WIDTH, CURRENT_HEIGHT;
 
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+
 static void processInput(GLFWwindow *window);
 
 /**
@@ -19,7 +20,7 @@ static void processInput(GLFWwindow *window);
  * @param height initial height of the window
  */
 template<bool (*render_loop_call)(GLFWwindow *window), void (*call_after_glfw_init)(GLFWwindow *window)>
-void init(int width, int height) {
+void init(int width, int height, std::string title) {
     CURRENT_WIDTH = width;
     CURRENT_HEIGHT = height;
 
@@ -35,7 +36,7 @@ void init(int width, int height) {
 #endif
 
     // create window
-    GLFWwindow *window = glfwCreateWindow(width, height, "ComputeParticle shader", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(width, height, title.data(), NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -50,6 +51,8 @@ void init(int width, int height) {
     }
 
     call_after_glfw_init(window);
+
+    glfwSwapInterval(0);
 
     bool result = true;
     while (!glfwWindowShouldClose(window) && result) {

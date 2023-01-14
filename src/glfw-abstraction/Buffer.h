@@ -7,7 +7,7 @@
 class Buffer {
 public:
     Buffer();
-    explicit Buffer(int size);
+    explicit Buffer(int size, int type);
 
     void init();
 
@@ -16,8 +16,11 @@ public:
 
     void bind(int index) const;
 
+    void delete_buffer();
+
     GLuint id;
     int size;
+    int type;
 };
 
 

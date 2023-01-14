@@ -2,7 +2,9 @@
 #define GAME_OF_LIFE_SIMPLESHADER_H
 
 #include <string>
+#include <array>
 #include "Texture.h"
+#include "Buffer.h"
 
 class SimpleShader {
 public:
@@ -64,6 +66,14 @@ public:
     void bind_uniform(const std::string &name, float *value, int count) const;
 
     /**
+     * Binds an vec4 vector to a uniform in the shaders.
+     * @param name name of the uniform
+     * @param vector vector to bind
+     */
+    void bind_uniform(const std::string &name, std::array<float, 4> vector) const;
+
+
+    /**
      * Returns the location of the uniform with the given name, can be used to cache
      * locations to save on glGetUniformLocation calls.
      */
@@ -105,6 +115,20 @@ public:
      * @param count number of values in the array
      */
     void bind_uniform(GLint location, float *value, int count) const;
+
+    /**
+     * Binds an vec4 vector to a uniform in the shaders.
+     * @param location location of the uniform
+     * @param vector vector to bind
+     */
+    void bind_uniform(GLint location, std::array<float, 4> vector) const;
+
+    GLint find_block_index(const std::string &name) const;
+
+    void bind_buffer(GLint location, const Buffer &buffer, int point) const;
+
+    void bind_buffer(const std::string &name, const Buffer &buffer, int point) const;
+
 private:
     const char *vertexPath;
     const char *fragmentPath;

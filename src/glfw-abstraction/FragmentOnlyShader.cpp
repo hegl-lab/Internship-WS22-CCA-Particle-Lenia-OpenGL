@@ -52,7 +52,6 @@ void FragmentOnlyShader::init(const std::string &arguments) {
 
 void FragmentOnlyShader::render() const {
     glBindVertexArray(VAO);
-
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
