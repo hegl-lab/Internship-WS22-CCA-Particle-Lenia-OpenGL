@@ -23,8 +23,8 @@ vec2 gradient(vec2 position) {
     float e4 = fields(position - vec2(0, h)).a;
 
     return vec2(
-        (e1 - e2) / h2,
-        (e3 - e4) / h2
+    (e1 - e2) / h2,
+    (e3 - e4) / h2
     );
 }
 
@@ -36,4 +36,5 @@ void main()
     particles_updated[gl_VertexID] = position;
 
     gl_Position.xyz = vec3((position.x - translate_x) / internal_width, (position.y - translate_y) / internal_height, 0.0);
+    //gl_Position.xyz = vec3(0.0, 0.0, 0.0);
 }

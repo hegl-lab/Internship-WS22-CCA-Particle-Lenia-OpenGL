@@ -134,6 +134,14 @@ void SimpleShader::bind_uniform(const std::string &name, std::array<float, 4> ve
     bind_uniform(get_location(name), vector);
 }
 
+void SimpleShader::bind_uniform(const std::string &name, std::array<float, 3> vector) const {
+    bind_uniform(get_location(name), vector);
+}
+
+void SimpleShader::bind_uniform(const std::string &name, std::array<float, 9> matrix) const {
+    bind_uniform(get_location(name), matrix);
+}
+
 void SimpleShader::bind_uniform(const std::string &name, float *value, int count) const {
     glUniform1fv(glGetUniformLocation(id, name.c_str()), count, value);
 }
@@ -167,6 +175,10 @@ void SimpleShader::bind_uniform(GLint location, std::array<float, 4> vector) con
     glUniform4f(location, vector[0], vector[1], vector[2], vector[3]);
 }
 
+void SimpleShader::bind_uniform(GLint location, std::array<float, 3> vector) const {
+    glUniform3f(location, vector[0], vector[1], vector[2]);
+}
+
 GLint SimpleShader::find_block_index(const std::string &name) const {
     return glGetProgramResourceIndex(id, GL_SHADER_STORAGE_BLOCK, name.c_str());
 }
@@ -178,4 +190,8 @@ void SimpleShader::bind_buffer(GLint location, const Buffer &buffer, int point) 
 
 void SimpleShader::bind_buffer(const std::string &name, const Buffer &buffer, int point) const {
     bind_buffer(find_block_index(name), buffer, point);
+}
+
+void SimpleShader::bind_uniform(GLint location, std::array<float, 9> matrix) const {
+    glUniformMatrix3fv(location, 1, false, matrix.data());
 }

@@ -37,13 +37,20 @@ vec4 blend(vec4 color1, vec4 color2, float amount) {
     return (1.0 - amount) * color1 + amount * color2;
 }
 
+float norm_squared(vec2 vector) {
+    return vector.x * vector.x + vector.y * vector.y;
+}
+
 void main()
 {
+    float x = (TexCoord.x - 0.5) * 2 * internal_width + translate_x;
+    float y = (TexCoord.y - 0.5) * 2 * internal_height + translate_y;
+
+    vec2 position = vec2(x, y);
+
     if (render_1 == 0 && render_2 == 0) {
         FragColor = background_color;
     } else {
-        float x = (TexCoord.x - 0.5) * 2 * internal_width + translate_x;
-        float y = (TexCoord.y - 0.5) * 2 * internal_height + translate_y;
 
         vec4 fields = fields(vec2(x, y));
 
@@ -86,5 +93,13 @@ void main()
             ),
             color2, value_2
         );
+    }
+
+    for (int i = 0; i < num_particles; ++i) {
+        float distance = norm_squared(particles[i] - position);
+        if (distance < 0.01) {
+            FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            break;
+        }
     }
 }

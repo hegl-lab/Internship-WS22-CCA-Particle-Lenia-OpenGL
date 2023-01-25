@@ -50,6 +50,8 @@ float translate_y;
 bool is_particles_a = true;
 bool pause = false;
 
+int steps_per_frame = 10;
+
 unsigned int VAO;
 
 Buffer particles_a(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
@@ -57,6 +59,7 @@ Buffer particles_b(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
 
 SimpleShader shader("shaders/particle-lenia/2d/particle_2d.generated.vert", "shaders/particle-lenia/particle.frag");
 FragmentOnlyShader info_shader("shaders/particle-lenia/2d/fields_2d.generated.frag");
+SimpleComputeShader particle_step("shaders/particle-lenia/2d/particle_2d.comp");
 
 bool render_loop_call(GLFWwindow *window);
 
@@ -149,18 +152,45 @@ ImVec2 translate_mouse_position(bool include_translate = false) {
 }
 
 bool render_loop_call(GLFWwindow *window) {
-    if (is_particles_a) {
-        shader.bind_buffer("ParticlesBuffer", particles_a, 0);
-        info_shader.bind_buffer("ParticlesBuffer", particles_a, 0);
-        shader.bind_buffer("ParticlesBufferUpdated", particles_b, 1);
-    } else {
-        shader.bind_buffer("ParticlesBuffer", particles_b, 0);
-        info_shader.bind_buffer("ParticlesBuffer", particles_b, 0);
-        shader.bind_buffer("ParticlesBufferUpdated", particles_a, 1);
-    }
-    if (!pause) is_particles_a = !is_particles_a;
+    for (int i = 0; i < steps_per_frame; ++i) {
+        if (is_particles_a) {
+            particle_step.bind_buffer("ParticlesBuffer", particles_a, 0);
+            info_shader.bind_buffer("ParticlesBuffer", particles_a, 0);
+            particle_step.bind_buffer("ParticlesBufferUpdated", particles_b, 1);
+            //particle_display.bind_buffer("ParticlesBufferUpdated", particles_b, 1);
+        } else {
+            particle_step.bind_buffer("ParticlesBuffer", particles_b, 0);
+            info_shader.bind_buffer("ParticlesBuffer", particles_b, 0);
+            particle_step.bind_buffer("ParticlesBufferUpdated", particles_a, 1);
+            //particle_display.bind_buffer("ParticlesBufferUpdated", particles_a, 1);
+        }
+        if (!pause) is_particles_a = !is_particles_a;
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        particle_step.use();
+
+        particle_step.bind_uniform("view_width", (float) view_width);
+        particle_step.bind_uniform("view_height", (float) view_height);
+        particle_step.bind_uniform("internal_width", (float) internal_width);
+        particle_step.bind_uniform("internal_height", (float) internal_height);
+        particle_step.bind_uniform("w_k", w_k);
+        particle_step.bind_uniform("mu_k", mu_k);
+        particle_step.bind_uniform("sigma_k2", sigma_k2);
+        particle_step.bind_uniform("mu_g", mu_g);
+        particle_step.bind_uniform("sigma_g2", sigma_g2);
+        particle_step.bind_uniform("c_rep", c_rep);
+        particle_step.bind_uniform("r_distance", r_distance);
+        particle_step.bind_uniform("num_particles", num_particles);
+        particle_step.bind_uniform("h", h);
+        particle_step.bind_uniform("h2", h2);
+        particle_step.bind_uniform("dt", dt);
+        particle_step.bind_uniform("translate_x", translate_x);
+        particle_step.bind_uniform("translate_y", translate_y);
+
+        particle_step.dispatch(num_particles, 1, 1);
+        particle_step.wait();
+    }
 
     info_shader.use();
     info_shader.bind_uniform("view_width", (float) view_width);
@@ -180,37 +210,14 @@ bool render_loop_call(GLFWwindow *window) {
     info_shader.bind_uniform("dt", dt);
     info_shader.bind_uniform("render_1", render_1);
     info_shader.bind_uniform("render_2", render_2);
-    info_shader.bind_uniform("background_color", {background_color.x, background_color.y, background_color.z,
+    info_shader.bind_uniform("background_color",
+                             std::array<float, 4>{background_color.x, background_color.y, background_color.z,
                                                   background_color.w});
-    info_shader.bind_uniform("color1", {color_1.x, color_1.y, color_1.z, color_1.w});
-    info_shader.bind_uniform("color2", {color_2.x, color_2.y, color_2.z, color_2.w});
+    info_shader.bind_uniform("color1", std::array<float, 4>{color_1.x, color_1.y, color_1.z, color_1.w});
+    info_shader.bind_uniform("color2", std::array<float, 4>{color_2.x, color_2.y, color_2.z, color_2.w});
     info_shader.bind_uniform("translate_x", translate_x);
     info_shader.bind_uniform("translate_y", translate_y);
     info_shader.render_to_window();
-
-    shader.use();
-
-    shader.bind_uniform("view_width", (float) view_width);
-    shader.bind_uniform("view_height", (float) view_height);
-    shader.bind_uniform("internal_width", (float) internal_width);
-    shader.bind_uniform("internal_height", (float) internal_height);
-    shader.bind_uniform("w_k", w_k);
-    shader.bind_uniform("mu_k", mu_k);
-    shader.bind_uniform("sigma_k2", sigma_k2);
-    shader.bind_uniform("mu_g", mu_g);
-    shader.bind_uniform("sigma_g2", sigma_g2);
-    shader.bind_uniform("c_rep", c_rep);
-    shader.bind_uniform("r_distance", r_distance);
-    shader.bind_uniform("num_particles", num_particles);
-    shader.bind_uniform("h", h);
-    shader.bind_uniform("h2", h2);
-    shader.bind_uniform("dt", dt);
-    shader.bind_uniform("translate_x", translate_x);
-    shader.bind_uniform("translate_y", translate_y);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDrawArrays(GL_POINTS, 0, num_particles);
-
 
     // create control window
     ImGui_ImplOpenGL3_NewFrame();
@@ -281,10 +288,13 @@ bool render_loop_call(GLFWwindow *window) {
             if (ImGui::SliderInt("Number of Particles", &num_particles, 0, 2500)) {
                 resize_buffer(reset_on_change);
             }
+            ImGui::SliderInt("Steps per frame", &steps_per_frame, 1, 1000);
         }
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
+        ImGui::Text("Application average %.3f ms/step", (1000.0f / ImGui::GetIO().Framerate) / steps_per_frame);
+
         ImGui::End();
     }
 
@@ -339,6 +349,7 @@ void call_after_glfw_init(GLFWwindow *window) {
 
     shader.init_without_arguments();
     info_shader.init_without_arguments();
+    particle_step.init_without_arguments();
 
     glGenVertexArrays(1, &VAO);
 

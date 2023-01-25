@@ -72,6 +72,19 @@ public:
      */
     void bind_uniform(const std::string &name, std::array<float, 4> vector) const;
 
+    /**
+     * Binds an vec3 vector to a uniform in the shaders.
+     * @param name name of the uniform
+     * @param vector vector to bind
+     */
+    void bind_uniform(const std::string &name, std::array<float, 3> vector) const;
+
+    /**
+     * Binds a mat3 to a uniform in the shaders.
+     * @param name name of the uniform
+     * @param matrix matrix to bind
+     */
+    void bind_uniform(const std::string &name, std::array<float, 9> matrix) const;
 
     /**
      * Returns the location of the uniform with the given name, can be used to cache
@@ -122,6 +135,20 @@ public:
      * @param vector vector to bind
      */
     void bind_uniform(GLint location, std::array<float, 4> vector) const;
+
+    /**
+     * Binds an vec3 vector to a uniform in the shaders.
+     * @param location location of the uniform
+     * @param vector vector to bind
+     */
+    void bind_uniform(GLint location, std::array<float, 3> vector) const;
+
+    /**
+     * Binds a mat3x3 to a uniform in the shaders.
+     * @param location location of the uniform
+     * @param matrix to bind
+     */
+    void bind_uniform(GLint location, std::array<float, 9> matrix) const;
 
     GLint find_block_index(const std::string &name) const;
 
