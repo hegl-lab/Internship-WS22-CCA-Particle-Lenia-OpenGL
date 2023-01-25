@@ -52,14 +52,11 @@ bool pause = false;
 
 int steps_per_frame = 10;
 
-unsigned int VAO;
-
 Buffer particles_a(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
 Buffer particles_b(num_particles * 2, GL_SHADER_STORAGE_BUFFER);
 
-SimpleShader shader("shaders/particle-lenia/2d/particle_2d.generated.vert", "shaders/particle-lenia/particle.frag");
 FragmentOnlyShader info_shader("shaders/particle-lenia/2d/fields_2d.generated.frag");
-SimpleComputeShader particle_step("shaders/particle-lenia/2d/particle_2d.comp");
+SimpleComputeShader particle_step("shaders/particle-lenia/2d/particle_2d.generated.comp");
 
 bool render_loop_call(GLFWwindow *window);
 
@@ -347,12 +344,8 @@ void call_after_glfw_init(GLFWwindow *window) {
     // generate random particles
     reset_particles();
 
-    shader.init_without_arguments();
     info_shader.init_without_arguments();
     particle_step.init_without_arguments();
-
-    glGenVertexArrays(1, &VAO);
-
 
     // ImGui setup following
     // Setup Dear ImGui context

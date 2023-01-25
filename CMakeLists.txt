@@ -37,5 +37,7 @@ add_custom_target(copy-shaders ALL
         COMMAND ${CMAKE_COMMAND} -E cat ${fields_functions_2d} ${CMAKE_SOURCE_DIR}/shaders/particle-lenia/2d/fields_2d.frag >> ${CMAKE_BINARY_DIR}/shaders/particle-lenia/2d/fields_2d.generated.frag
         COMMAND ${CMAKE_COMMAND} -E echo \"${generated_warning}\" > ${CMAKE_BINARY_DIR}/shaders/particle-lenia/2d/particle_2d.generated.vert
         COMMAND ${CMAKE_COMMAND} -E cat ${fields_functions_2d} ${CMAKE_SOURCE_DIR}/shaders/particle-lenia/2d/particle_2d.vert >> ${CMAKE_BINARY_DIR}/shaders/particle-lenia/2d/particle_2d.generated.vert
+        COMMAND ${CMAKE_COMMAND} -E echo \"${generated_warning}\" > ${CMAKE_BINARY_DIR}/shaders/particle-lenia/2d/particle_2d.generated.comp
+        COMMAND ${CMAKE_COMMAND} -E cat ${fields_functions_2d} ${CMAKE_SOURCE_DIR}/shaders/particle-lenia/2d/particle_2d.comp >> ${CMAKE_BINARY_DIR}/shaders/particle-lenia/2d/particle_2d.generated.comp
         )
 
